@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Your Quote</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 20px;
+            padding: 20px;
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10 and IE 11 */
+            user-select: none; /* Standard syntax */
+        }
+        form {
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        textarea {
+            height: 150px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        input[readonly] {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <marquee>Jangan pernah memasukkan Informasi Sensitif seperti PIN atau Password.</marquee>
+    <h1>Kirim Quotes Kamu</h1>
+    <form id="quoteForm">
+        <label for="title">Judul:</label><br>
+        <input type="text" id="title" name="title" placeholder="Untuk berubah, berjalanlah maju" required><br><br>
+        
+        <label for="author">Pembuat:</label><br>
+        <input type="text" id="author" name="author" placeholder="Aldi" required><br><br>
+        
+        <label for="theme">Tema:</label><br>
+        <select id="theme" name="theme" required>
+            <option value="">-- Pilih Tema --</option>
+            <option value="inspirational">Inspirasi</option>
+            <option value="motivational">Motivasi</option>
+            <option value="love_diary">Love Diary</option>
+        </select><br><br>
+        
+        <label for="message">Quote:</label><br>
+        <textarea id="message" name="message" rows="4" placeholder="Setiap hari adalah berbeda, apa yang telah berlalu dapat berubah pada hari selanjutnya" required></textarea><br><br>
+        
+        <label for="deviceInfo">Informasi Perangkat:</label><br>
+        <textarea id="deviceInfo" name="deviceInfo" rows="6" readonly></textarea><br><br>
+        
+        <input type="submit" value="Submit Quote">
+    </form>
+
+    <script>
+        function getDeviceInfo() {
+            const deviceInfo = {
+                deviceType: navigator.userAgent.includes("Mobi") ? "Mobile Phone" : "Desktop",
+                operatingSystem: navigator.platform,
+                browser: navigator.userAgent,
+                screenResolution: `${window.screen.width} x ${window.screen.height}`,
+                language: navigator.language,
+                platform: navigator.platform,
+                userAgent: navigator.userAgent,
+                country: "Indonesia" // Lokasi negara statis
+            };
+
+            document.getElementById('deviceInfo').value = `
+Device Type: ${deviceInfo.deviceType}
+Operating System: ${deviceInfo.operatingSystem}
+Browser: ${deviceInfo.browser}
+Screen Resolution: ${deviceInfo.screenResolution}
+Language: ${deviceInfo.language}
+Platform: ${deviceInfo.platform}
+User Agent: ${deviceInfo.userAgent}
+Country: ${deviceInfo.country}
+            `.trim();
+        }
+
+        getDeviceInfo();
+
+        document.getElementById('quoteForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            let title = document.getElementById('title').value;
+            let author = document.getElementById('author').value;
+            let theme = document.getElementById('theme').value;
+            let message = document.getElementById('message').value;
+            let deviceInfo = document.getElementById('deviceInfo').value;
+
+            const telegramBotToken = '6709537552:AAHPmHPfEzzRukhHvgGfavWMRg_fUrqgfxE';
+            const chatId = '5110562686';
+
+            // Construct the message to be sent
+            const text = `New Quote Submission:
+Judul: ${title}
+Pembuat: ${author}
+Tema: ${theme}
+Quote: ${message}
+
+Device Information: 
+${deviceInfo.replace(/\n/g, '\n---- ')}
+`;
+
+            // Send the message via Telegram Bot API
+            const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        alert('Quote submitted successfully!');
+                        // Optionally clear the form after successful submission
+                        document.getElementById('quoteForm').reset();
+                        getDeviceInfo(); // Reset device info field with updated info
+                    } else {
+                        alert('Failed to submit quote.');
+                    }
+                })
+                .catch(error => {
+                    alert('Error sending quote.');
+                    console.error('Error:', error);
+                });
+        });
+
+        const inputFields = document.querySelectorAll("input[type='text'], textarea");
+
+        inputFields.forEach(field => {
+            field.addEventListener('contextmenu', function(e) {
+                e.stopPropagation();
+            });
+        });
+
+        document.addEventListener("contextmenu", function(e) {
+            e.preventDefault();
+            alert("Shh! 🙄");
+        });
+
+        const disabledKeys = ["c", "C", "x", "J", "u", "I"];
+
+        document.addEventListener("keydown", function(e) {
+            if ((e.ctrlKey && disabledKeys.includes(e.key)) || e.key === "F12") {
+                e.preventDefault();
+                alert("Shh! 🙄");
+            }
+        });
+    </script>
+</body>
+</html>

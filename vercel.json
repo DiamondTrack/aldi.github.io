@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "trailingSlash": true,
+  "builds": [
+    { "src": "Dockerfile", "use": "@vercel/static-build", "config": { "distDir": "." } }
+  ],
+  "rewrites": [
+    { "source": "/motivasi", "destination": "/quotes/motivasi/index.php" },
+    { "source": "/kutipan", "destination": "/quotes/kutipan/index.php" },
+    { "source": "/diary", "destination": "/quotes/diary/index.php" }
+  ]
+}
